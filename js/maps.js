@@ -9,6 +9,7 @@ var inputEnd = /** @type {!HTMLInputElement} */ (
     document.getElementById('inputEnd'));
 
 
+// Reset markers, and routes.
 $("#reset").click(function (event) {
     if(markers.length > 0)
     if (confirm("Reset markers?")) {
@@ -22,6 +23,8 @@ $("#reset").click(function (event) {
     }
 });
 
+
+//Init map, and start position
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
@@ -54,16 +57,19 @@ function initMap() {
     initAutoComplete();
 }
 
+// Call AutoComplete for inputs list places
 function initAutoComplete() {
     setAutoComplete(inputStart, 0);
     setAutoComplete(inputEnd, 1);
 }
 
+
+// Set AutoComplete for inputs list places
 function setAutoComplete(input, positionMarkerInArray) {
     var autocomplete = new google.maps.places.Autocomplete(input);
     autocomplete.bindTo('bounds', map);
 
-
+    //When user put a data in input, this Listener is Activate
     autocomplete.addListener('place_changed', function () {
         var place = autocomplete.getPlace();
         if (!place.geometry) {
@@ -92,6 +98,7 @@ function setAutoComplete(input, positionMarkerInArray) {
     });
 }
 
+//Add marker in map
 function addMarker(position, info, positionMarkerInArray) {
     directionsDisplay.setMap(map);
     if (!markers[positionMarkerInArray]) {
@@ -116,6 +123,7 @@ function addMarker(position, info, positionMarkerInArray) {
     }
 }
 
+// Display route in map
 function displayRoute() {
     directionsService.route({
         origin: new google.maps.LatLng(markers[0].getPosition().lat(), markers[0].getPosition().lng()),
@@ -132,6 +140,7 @@ function displayRoute() {
     });
 }
 
+// When the markers are moved, put the new address values in input
 function computeTotalDistance(result) {
     console.log("change computeTotalDistance()", result);
     let myroute = result.routes[0];
