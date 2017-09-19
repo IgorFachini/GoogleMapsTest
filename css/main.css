@@ -15,3 +15,9 @@
   font-size: 13px;
   font-weight: 300;
 }
+
+#right-panel {
+  height: 500px;  /* width: 390px; */
+  overflow-y: scroll;
+}
+

@@ -11,8 +11,8 @@ var inputEnd = /** @type {!HTMLInputElement} */ (
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
-            lat: -33.8688,
-            lng: 151.2195
+            lat: -26.4665992733309,
+            lng: -49.11446034908295
         },
         zoom: 13
     });
@@ -21,6 +21,13 @@ function initMap() {
         draggable: true,
         map: map,
         panel: document.getElementById('right-panel')
+    });
+
+    // Listen for clicks and add the location of the click to firebase.
+    map.addListener('click', function (e) {
+        document.getElementById("changetype-start").checked ?
+        addMarker(new google.maps.LatLng(e.latLng.lat(), e.latLng.lng()),"Place start",0):
+        addMarker(new google.maps.LatLng(e.latLng.lat(), e.latLng.lng()),"Place end",1);
     });
 
     directionsDisplay.addListener('directions_changed', function () {
@@ -111,10 +118,10 @@ function displayRoute() {
 }
 
 function computeTotalDistance(result) {
-    console.log("change computeTotalDistance()",result);
+    console.log("change computeTotalDistance()", result);
     let myroute = result.routes[0];
     inputStart.value = myroute.legs[0].start_address;
     inputEnd.value = myroute.legs[0].end_address;
-    document.getElementById('total').innerHTML =  myroute.legs[0].distance.text;
-    document.getElementById('time').innerHTML =  myroute.legs[0].duration.text;
+    document.getElementById('total').innerHTML = myroute.legs[0].distance.text;
+    document.getElementById('time').innerHTML = myroute.legs[0].duration.text;
 }
