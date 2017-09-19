@@ -8,6 +8,20 @@ var inputStart = /** @type {!HTMLInputElement} */ (
 var inputEnd = /** @type {!HTMLInputElement} */ (
     document.getElementById('inputEnd'));
 
+
+$("#reset").click(function (event) {
+    if(markers.length > 0)
+    if (confirm("Reset markers?")) {
+        if(markers[0])markers[0].setMap(null)
+        if(markers[1])markers[1].setMap(null)
+
+        markers = [];
+        infoWindows = [];
+        directionsDisplay.setMap(null);
+        $('#right-panel').text("");
+    }
+});
+
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
         center: {
@@ -26,8 +40,8 @@ function initMap() {
     // Listen for clicks and add the location of the click to firebase.
     map.addListener('click', function (e) {
         document.getElementById("changetype-start").checked ?
-        addMarker(new google.maps.LatLng(e.latLng.lat(), e.latLng.lng()),"Place start",0):
-        addMarker(new google.maps.LatLng(e.latLng.lat(), e.latLng.lng()),"Place end",1);
+            addMarker(new google.maps.LatLng(e.latLng.lat(), e.latLng.lng()), "Place start", 0) :
+            addMarker(new google.maps.LatLng(e.latLng.lat(), e.latLng.lng()), "Place end", 1);
     });
 
     directionsDisplay.addListener('directions_changed', function () {
@@ -79,6 +93,7 @@ function setAutoComplete(input, positionMarkerInArray) {
 }
 
 function addMarker(position, info, positionMarkerInArray) {
+    directionsDisplay.setMap(map);
     if (!markers[positionMarkerInArray]) {
         var marker = new google.maps.Marker({
             map: map,
@@ -122,6 +137,6 @@ function computeTotalDistance(result) {
     let myroute = result.routes[0];
     inputStart.value = myroute.legs[0].start_address;
     inputEnd.value = myroute.legs[0].end_address;
-    document.getElementById('total').innerHTML = myroute.legs[0].distance.text;
-    document.getElementById('time').innerHTML = myroute.legs[0].duration.text;
+    // document.getElementById('total').innerHTML = myroute.legs[0].distance.text;
+    // document.getElementById('time').innerHTML = myroute.legs[0].duration.text;
 }
