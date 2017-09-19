@@ -1,5 +1,7 @@
 # GoogleMapsTest
 
+  <a href="https://igorfachini.github.io/GoogleMapsTest/" class="list-group-item active">LIVE PREVIEW!!</a>
+
   <div class="container">
     <div class="row">
       <div class="col-lg-12">
@@ -16,7 +18,7 @@
           <li class="list-group-item active text-black">Pages</li>
           <li class="list-group-item">
             <ul class="list-group">
-              <a href="pages/mapsDirection.html" class="list-group-item active">MapsDirections</a>
+              <a href="https://igorfachini.github.io/GoogleMapsTest/pages/mapsDirection.html" class="list-group-item active">MapsDirections</a>
               <li class="list-group-item">Auto complete address. Reference: <a href="https://developers.google.com/maps/documentation/javascript/examples/places-autocomplete">Link</a></li>
               <li class="list-group-item">Directions on two points with marker draggable!. Reference: <a href="https://developers.google.com/maps/documentation/javascript/examples/directions-draggable">Link</a></li>
               <li class="list-group-item">Info Window on first place marker. Reference: <a href="https://developers.google.com/maps/documentation/javascript/examples/infowindow-simple">Link</a></li>
