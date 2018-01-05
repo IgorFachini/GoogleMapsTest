@@ -50,6 +50,16 @@ function initMap() {
 
 function refFireFunctions(){
   firebase.database().ref('positions').on('child_added', function(snapshot) {
+    $('#myTable tr:last').after(`<tr>
+    <td>${snapshot.val().time}</td>
+    <td>${snapshot.val().ignicao}</td>
+    <td>${snapshot.val().speed}</td>
+    <td>${snapshot.val().satelites}</td>
+    <td>${snapshot.val().bateryLevel}</td>
+    <td>${snapshot.val().accuracy}</td>
+    
+    </tr>`);
+
     if(snapshot.val().ignicao === "0"){
       addCircle(new google.maps.LatLng(Number(snapshot.val().lat), Number(snapshot.val().lng)));
     }
