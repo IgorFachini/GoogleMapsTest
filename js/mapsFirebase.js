@@ -52,6 +52,8 @@ function refFireFunctions(){
   firebase.database().ref('positions').on('child_added', function(snapshot) {
     $('#myTable tr:last').after(`<tr>
     <td>${snapshot.val().time}</td>
+    <td>{lat:${snapshot.val().lat},lng:${snapshot.val().lng}}</td>
+
     <td>${snapshot.val().ignicao}</td>
     <td>${snapshot.val().speed}</td>
     <td>${snapshot.val().satelites}</td>
