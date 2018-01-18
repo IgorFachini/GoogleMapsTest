@@ -16,7 +16,7 @@ var carIcon;
 var carColor = "#df576a";
 var footColor = "#0eb7f6";
 var footIcon;
-
+var s = [];
 //Init map, and start position
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
@@ -78,7 +78,7 @@ var beforeMode = [];
 function refFireFunctions() {
   firebase
     .database()
-    .ref("positions")
+    .ref("positions2")
     .on("child_added", function(snapshot) {
       // console.log("ponto novo adicionado");
       // console.log(snapshot.val());
@@ -96,7 +96,9 @@ function refFireFunctions() {
     <td>${snapshot.val().accuracy}</td>
     
     </tr>`);
-
+      if(new Date(snapshot.val().time).getDate() === 17){
+        s.push(snapshot.val());
+      }
       if (snapshot.val().ignicao === "0") {
         addCircle(
           new google.maps.LatLng(
@@ -105,7 +107,7 @@ function refFireFunctions() {
           )
         );
       }
-      console.log(beforeMode, path);
+      // console.log(beforeMode, path);
       if (snapshot.val().peopleMode != beforeMode) {
         if (beforeMode == 1) {
           addLatLng(path, "green");
@@ -136,21 +138,21 @@ function refFireFunctions() {
 
       beforeMode = snapshot.val().peopleMode;
 
-      var infowindow = new google.maps.InfoWindow({
-        content: JSON.stringify(snapshot.val())
-      });
+      // var infowindow = new google.maps.InfoWindow({
+      //   content: JSON.stringify(snapshot.val())
+      // });
 
-      var marker = new google.maps.Marker({
-        position: new google.maps.LatLng(
-          Number(snapshot.val().lat),
-          Number(snapshot.val().lng)
-        ),
-        map: map,
-        title: "Info"
-      });
-      marker.addListener("click", function() {
-        infowindow.open(map, marker);
-      });
+      // var marker = new google.maps.Marker({
+      //   position: new google.maps.LatLng(
+      //     Number(snapshot.val().lat),
+      //     Number(snapshot.val().lng)
+      //   ),
+      //   map: map,
+      //   title: "Info"
+      // });
+      // marker.addListener("click", function() {
+      //   infowindow.open(map, marker);
+      // });
     });
 }
 
@@ -209,7 +211,7 @@ function addCircle(latLng) {
 
 
 function getFromFile() {
-    $.each( dataJson, function( key, val ) {
+    $.each( dataJson2, function( key, val ) {
       if(val.lat){
         addFromFile(val);
       }
