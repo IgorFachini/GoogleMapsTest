@@ -57,7 +57,7 @@
     </nav>
 
     <!-- Page Content -->
-    <div class="container">
+    <div id="myContainer" class="container">
         <div class="row">
             <div class="col-md-12 text-center">
                 <div id="map"></div>
@@ -66,6 +66,18 @@
 
         <div class="row">
             <div class="col-md-12 text-center">
+                <select v-model="trackerNumber">
+                    <option disabled value="">Escolha um item</option>
+                    <option v-for='(v,n) in trackers' :value="n">{{v['.key']}}</option>
+                </select>
+                <select v-model="dateId">
+                        <option disabled value="">Escolha um item</option>
+                        <option v-for='(v,k,n) in trackers[trackerNumber]' :value="k">{{k}}</option>
+                </select>
+                <button onclick="refFireFunctions()">Atualizar</button>
+                <button onclick="addLatLng(path, 'green')">add linha</button>
+
+                
                 <table class="table" id="myTable">
                     <thead>
                         <tr>
@@ -73,7 +85,7 @@
                             <th>cordenadas</th>
                             <th>Ignicao</th>
                             <th>Conectado</th>
-                            <th>Modo Pessoa</th>                            
+                            <th>Modo Pessoa</th>
                             <th>Velocidade</th>
                             <th>Satelites</th>
                             <th>Nivel Bateria</th>
@@ -81,7 +93,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        
+                        <tr v-for='(v,k,n) in allDataVm'>
+                            <!-- <td>v {{v}}</td> -->
+                            <!-- <td>k {{k}}</td> -->
+                            <!-- <td>n {{n}}</td> -->
+
+
+                            <td> {{v.time}}</td>
+                            <td>lat:{{v.lat}},lng:{{v.lng}}</td>
+                            <td>{{v.ignicao}}</td>
+                            <td>{{v.batteryState}}</td>
+
+                            <td>{{v.peopleMode}}</td>
+                            <td>{{v.speed}}</td>
+                            <td>{{v.satelites}}</td>
+                            <td>{{v.batteryLevel}}</td>
+                            <td>{{v.accuracy}}</td>
+                        </tr>
+
                     </tbody>
                 </table>
             </div>
@@ -94,7 +123,11 @@
     <script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
 
     <!-- <script src="../js/main.js"></script> -->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
+    <script src="https://unpkg.com/vuefire/dist/vuefire.js"></script>
+
     <script src="../js/test.js"></script>
 
     <script src="../js/mapsFirebase.js"></script>
