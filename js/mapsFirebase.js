@@ -10,7 +10,8 @@ var config = {
   storageBucket: "mapstest-7149e.appspot.com",
   messagingSenderId: "546774782552"
 };
-firebase.initializeApp(config);
+var firebaseApp = firebase.initializeApp(config);
+var db = firebaseApp.database();
 
 var carIcon;
 var carColor = "#df576a";
@@ -21,145 +22,192 @@ var s = [];
 function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: {
-      // lat: -26.4665992733309,
-      // lng: -49.11446034908295
       lat: -26.2728305,
       lng: -48.8760667
     },
     zoom: 13
   });
-  carIcon = [
-    {
-      icon: {
-        path: google.maps.SymbolPath.FORWARD_OPEN_ARROW
-      },
-      offset: "100%",
-      repeat: "20px"
-    }
-  ];
-  footIcon = [
-    {
-      icon: {
-        path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-        // fillOpacity: 1,
-        scale: 2
-      },
-      offset: "100%",
-      repeat: "20px"
-    }
-  ];
-  poly = new google.maps.Polyline({
-    strokeColor: carColor,
-    // strokeOpacity: 0,
-    // fillOpacity: 0,
-    strokeOpacity: 1.0,
-    strokeWeight: 1,
-    icons: footIcon
-    // geodesic: true,
-  });
-  poly.setMap(map);
-
-  map.addListener("click", addLatLng2);
-  refFireFunctions();
 }
 
-  // Handles click events on a map, and adds a new point to the Polyline.
-  function addLatLng2(latLng) {
-    var path = poly.getPath();
-
-    // Because path is an MVCArray, we can simply append a new coordinate
-    // and it will automatically appear.
-    path.push(latLng);
-
+var vmMyContainer = new Vue({
+  el: "#myContainer",
+  data: {
+    trackerNumber: 0,
+    dateId: "",
+    allDataVm: []
+  },
+  firebase: function() {
+    return {
+      trackers: db.ref(`positions/`)
+    };
   }
+});
+// Remove todos
+// firebase.database().ref().child('positions').remove();
+var allData = [];
 var path = [];
-var beforeMode = [];
-// var allValues = [];
+var allValues = [];
 function refFireFunctions() {
+  vmMyContainer.allDataVm = [];
+  polyRoute = [];
+  markers = [];
+  console.log(
+    "refFireFunctions",
+    `positions/${vmMyContainer.trackers[vmMyContainer.trackerNumber][".key"]}/${
+      vmMyContainer.dateId
+    }`
+  );
+
   firebase
     .database()
-    .ref("positions2")
+    .ref(
+      `positions/${
+        vmMyContainer.trackers[vmMyContainer.trackerNumber][".key"]
+      }/${vmMyContainer.dateId}`
+    )
     .on("child_added", function(snapshot) {
-      // console.log("ponto novo adicionado");
-      // console.log(snapshot.val());
-      // allValues.push(snapshot.val());
-      $("#myTable tr:last").after(`<tr>
-    <td>${snapshot.val().time}</td>
-    <td>{lat:${snapshot.val().lat},lng:${snapshot.val().lng}}</td>
-    <td>${snapshot.val().ignicao}</td>
-    <td>${snapshot.val().batteryState}</td>
+      vmMyContainer.allDataVm.push(snapshot.val());
 
-    <td>${snapshot.val().peopleMode}</td>
-    <td>${snapshot.val().speed}</td>
-    <td>${snapshot.val().satelites}</td>
-    <td>${snapshot.val().batteryLevel}</td>
-    <td>${snapshot.val().accuracy}</td>
-    
-    </tr>`);
-      if(new Date(snapshot.val().time).getDate() === 17){
-        s.push(snapshot.val());
-      }
-      if (snapshot.val().ignicao === "0") {
-        addCircle(
-          new google.maps.LatLng(
-            Number(snapshot.val().lat),
-            Number(snapshot.val().lng)
-          )
-        );
-      }
-      // console.log(beforeMode, path);
-      if (snapshot.val().peopleMode != beforeMode) {
-        if (beforeMode == 1) {
-          addLatLng(path, "green");
-        } else {
-          addLatLng(path, "blue");
-        }
-        if (path[path.length - 1]) {
-          var beforePoint = path[path.length - 1];
-          path = [];
-          path.push(beforePoint);
-          path.push(
-            new google.maps.LatLng(
-              Number(snapshot.val().lat),
-              Number(snapshot.val().lng)
-            )
-          );
-        } else {
-          path = [];
-        }
-      } else {
-        path.push(
-          new google.maps.LatLng(
-            Number(snapshot.val().lat),
-            Number(snapshot.val().lng)
-          )
-        );
-      }
-
-      beforeMode = snapshot.val().peopleMode;
-
-      // var infowindow = new google.maps.InfoWindow({
-      //   content: JSON.stringify(snapshot.val())
-      // });
-
-      // var marker = new google.maps.Marker({
-      //   position: new google.maps.LatLng(
-      //     Number(snapshot.val().lat),
-      //     Number(snapshot.val().lng)
-      //   ),
-      //   map: map,
-      //   title: "Info"
-      // });
-      // marker.addListener("click", function() {
-      //   infowindow.open(map, marker);
-      // });
+      var marker = new google.maps.Marker({
+        position: new google.maps.LatLng(
+          Number(snapshot.val().lat),
+          Number(snapshot.val().lng)
+        ),
+        map: map,
+        title: "Info"
+      });
+      var infowindow = new google.maps.InfoWindow({
+        content: JSON.stringify(snapshot.val())
+      });
+      marker.addListener("click", function() {
+        infowindow.open(map, marker);
+      });
+      markers.push(marker);
+      allValues.push(snapshot.val());
+      path.push(
+        new google.maps.LatLng(
+          Number(snapshot.val().lat),
+          Number(snapshot.val().lng)
+        )
+      );
     });
 }
 
+function addPointsArray(array){
+  array.forEach(element => {
+    vmMyContainer.allDataVm.push(element);
+
+    var marker = new google.maps.Marker({
+      position: new google.maps.LatLng(
+        Number(element.lat),
+        Number(element.lng)
+      ),
+      map: map,
+      title: "Info"
+    });
+    var infowindow = new google.maps.InfoWindow({
+      content: JSON.stringify(element)
+    });
+    marker.addListener("click", function() {
+      infowindow.open(map, marker);
+    });
+    markers.push(marker);
+    allValues.push(element);
+    path.push(
+      new google.maps.LatLng(
+        Number(element.lat),
+        Number(element.lng)
+      )
+    );
+  });
+
+ 
+}
+//       // console.log("ponto novo adicionado");
+//       // console.log(snapshot.val());
+//       // allValues.push(snapshot.val());
+//       $("#myTable tr:last").after(`<tr>
+//     <td>${snapshot.val().time}</td>
+//     <td>{lat:${snapshot.val().lat},lng:${snapshot.val().lng}}</td>
+//     <td>${snapshot.val().ignicao}</td>
+//     <td>${snapshot.val().batteryState}</td>
+
+//     <td>${snapshot.val().peopleMode}</td>
+//     <td>${snapshot.val().speed}</td>
+//     <td>${snapshot.val().satelites}</td>
+//     <td>${snapshot.val().batteryLevel}</td>
+//     <td>${snapshot.val().accuracy}</td>
+
+//     </tr>`);
+//       if (snapshot.val().ignicao === "0") {
+//         addCircle(
+//           new google.maps.LatLng(
+//             Number(snapshot.val().lat),
+//             Number(snapshot.val().lng)
+//           )
+//         );
+//       }
+//       // console.log(beforeMode, path);
+//       if (snapshot.val().peopleMode != beforeMode) {
+//         console.log(beforeMode, path);
+
+//         if (beforeMode == 1) {
+//           addLatLng(path, "green");
+//         } else {
+//           addLatLng(path, "blue");
+//         }
+//         if (path[path.length - 1]) {
+//           var beforePoint = path[path.length - 1];
+//           path = [];
+//           path.push(beforePoint);
+//           path.push(
+//             new google.maps.LatLng(
+//               Number(snapshot.val().lat),
+//               Number(snapshot.val().lng)
+//             )
+//           );
+//         } else {
+//           path = [];
+//         }
+//       } else {
+//         path.push(
+//           new google.maps.LatLng(
+//             Number(snapshot.val().lat),
+//             Number(snapshot.val().lng)
+//           )
+//         );
+//       }
+
+//       beforeMode = snapshot.val().peopleMode;
+
+
+
+//     });
+// }
+
+// Sets the map on all markers in the array.
+function setMapOnAll(map) {
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(map);
+  }
+}
+
+// Removes the markers from the map, but keeps them in the array.
+function clearMarkers() {
+  setMapOnAll(null);
+}
+
+// Shows any markers currently in the array.
+function showMarkers() {
+  setMapOnAll(map);
+}
+
+var markers = [];
+var polyRoute;
 function addLatLng(path, color) {
   // console.log(path);
   var colorVariable = ["white", "green", "blue", "yellow", "rose"];
-  var poly = new google.maps.Polyline({
+  polyRoute = new google.maps.Polyline({
     path: path,
     map: map,
     strokeColor: color,
@@ -177,6 +225,10 @@ function addLatLng(path, color) {
     ]
   });
 }
+
+function removeLine() {
+  polyRoute.setMap(null);
+}
 function cPoly(color) {
   poly = new google.maps.Polyline({
     map: map,
@@ -193,7 +245,6 @@ function cPoly(color) {
       }
     ]
   });
-
 }
 function addCircle(latLng) {
   var cityCircle = new google.maps.Circle({
@@ -208,31 +259,23 @@ function addCircle(latLng) {
   });
 }
 
-
-
 function getFromFile() {
-    $.each( dataJson2, function( key, val ) {
-      if(val.lat){
-        addFromFile(val);
-      }
-    });
-  
+  $.each(dataJson2, function(key, val) {
+    if (val.lat) {
+      addFromFile(val);
+    }
+  });
 }
 var beforePoint;
 
-function addFromFile(p){
+function addFromFile(p) {
   console.log(p);
-  
+
   if (p.ignicao === "0") {
-    addCircle(
-      new google.maps.LatLng(
-        Number(p.lat),
-        Number(p.lng)
-      )
-    );
+    addCircle(new google.maps.LatLng(Number(p.lat), Number(p.lng)));
   }
   if (p.peopleMode != beforeMode) {
-    if(beforeMode.lat){
+    if (beforeMode.lat) {
       if (beforeMode == 1) {
         cPoly("green");
         addLatLng2(beforePoint);
@@ -241,19 +284,13 @@ function addFromFile(p){
         addLatLng2(beforePoint);
       }
     }
-   
-  } 
+  }
   // if (p.peopleMode == 1) {
   //   cPoly("green");
   // } else {
   //   cPoly("red");
   // }
-  beforePoint = new google.maps.LatLng(
-    Number(p.lat),
-    Number(p.lng));
+  beforePoint = new google.maps.LatLng(Number(p.lat), Number(p.lng));
   beforeMode = p.peopleMode;
-  addLatLng2(new google.maps.LatLng(
-    Number(p.lat),
-    Number(p.lng)));
-
+  addLatLng2(new google.maps.LatLng(Number(p.lat), Number(p.lng)));
 }

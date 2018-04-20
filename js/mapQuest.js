@@ -12,13 +12,24 @@ var trackCenter = false;
 var enableTrackCenter = false;
 L.mapquest.key = "ItgV4yIhtPxpn3s4hBdHqIU5dupXO9WK";
 
-var mapData = L.mapquest.map("map", {
-  center: [-26.4665992733309, -49.11446034908295],
-  layers: L.mapquest.tileLayer("map"),
-  zoom: 12
-});
+// var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+// 	osmAttrib = '&copy; <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+// 	osm = L.tileLayer(osmUrl, {maxZoom: 18, attribution: osmAttrib});
 
-mapData.addControl(L.mapquest.control());
+
+  var mapData = L.map('map', {center: [-26.4665992733309, -49.11446034908295],zoom: 12,rotate: true})
+		.setView([55, 10], 4)
+		.addLayer(osm);
+  
+// var mapData = L.mapquest.map("map", {
+//   rotate: true,
+//   center: [-26.4665992733309, -49.11446034908295],
+//   layers: L.mapquest.tileLayer("map"),
+//   touchRotate: true,
+//   zoom: 12
+// });
+
+// mapData.addControl(L.mapquest.control());
 mapData.addEventListener("move", eventRaised);
 mapData.addEventListener("moveend", eventRaised);
 var currentLocation = L.marker([-26.4665992733309, -49.11446034908295], {
@@ -59,7 +70,7 @@ var id,
   notFoundInitLocation = true;
 
 function success(pos) {
-  console.log("watch", pos);
+  // console.log("watch", pos);
   var crd = pos.coords;
   lastCrdw = crd;
   mapsContainerData.accuracy = crd.accuracy;
@@ -106,7 +117,7 @@ options = {
   maximumAge: 0
 };
 
-id = navigator.geolocation.watchPosition(success, error, options);
+// id = navigator.geolocation.watchPosition(success, error, options);
 
 
 // Recenter Button
